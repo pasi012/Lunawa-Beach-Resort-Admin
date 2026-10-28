@@ -38,8 +38,10 @@ const ROOM_DETAILS = {
         price: 6000,
     },
     "706": {
-        roomType: "Standard AC Room",
-        price: 6000,
+        roomType: "Special Sea View AC Room",
+        price: 7500,
+        description:
+            "Private balcony, sea view, tea and milk tea facilities.",
     },
     "707": {
         roomType: "Special Sea View AC Room",
@@ -140,11 +142,21 @@ function ManageBooking() {
 
         return Math.max(
             0,
-            Math.round((end - start) / (1000 * 60 * 60 * 24))
+            Math.round(
+                (end - start) / (1000 * 60 * 60 * 24)
+            )
         );
     };
 
-    // Read room details, including compatibility with older booking records.
+    // Calculate the estimated total price.
+    const getTotalPrice = (booking) => {
+        const room = getRoomDetails(booking);
+        const nights = getNights(booking);
+
+        return room.price * nights;
+    };
+
+    // Get room details using the current room configuration.
     const getRoomDetails = (booking) => {
         const roomNumber = booking.roomNumber
             ? String(booking.roomNumber)
@@ -154,23 +166,19 @@ function ManageBooking() {
 
         return {
             roomNumber: roomNumber || "Not assigned",
+
             roomType:
-                booking.roomType ||
                 room?.roomType ||
+                booking.roomType ||
                 "AC Room",
+
             price:
-                Number(booking.roomPrice) ||
-                room?.price ||
+                room?.price ??
+                Number(booking.roomPrice) ??
                 0,
+
+            description: room?.description || "",
         };
-    };
-
-    // Calculate the estimated total price.
-    const getTotalPrice = (booking) => {
-        const room = getRoomDetails(booking);
-        const nights = getNights(booking);
-
-        return room.price * nights;
     };
 
     // Normalize Sri Lankan and international WhatsApp numbers.
@@ -374,7 +382,7 @@ function ManageBooking() {
 
                 <div className="absolute inset-0 bg-black/60" />
 
-                
+
             </section>
 
             {/* MAIN CONTENT */}
@@ -395,13 +403,15 @@ function ManageBooking() {
 
                     {/* ROOM PRICE INFORMATION */}
                     <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+
+                        {/* STANDARD ROOMS */}
                         <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
                             <h3 className="font-semibold text-gray-800">
                                 Standard AC Rooms
                             </h3>
 
                             <p className="mt-1 text-sm text-gray-500">
-                                Rooms 701–706
+                                Rooms 701–705
                             </p>
 
                             <p className="mt-3 text-2xl font-bold text-[#00A6C7]">
@@ -412,13 +422,14 @@ function ManageBooking() {
                             </p>
                         </div>
 
+                        {/* SPECIAL ROOMS */}
                         <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
                             <h3 className="font-semibold text-gray-800">
-                                Special Sea View AC Room
+                                Special Sea View AC Rooms
                             </h3>
 
                             <p className="mt-1 text-sm text-gray-500">
-                                Room 707 · Balcony and sea view
+                                Rooms 706 and 707 · Private balcony and sea view
                             </p>
 
                             <p className="mt-3 text-2xl font-bold text-[#00A6C7]">
@@ -432,6 +443,7 @@ function ManageBooking() {
                                 Includes tea and milk tea facilities.
                             </p>
                         </div>
+
                     </div>
 
                     {/* BOOKING STATISTICS */}
@@ -736,7 +748,7 @@ function ManageBooking() {
                         )}
                     </div>
 
-                    {/* CONTACT INFORMATION */}
+                    {/* BOOKING MANAGEMENT NOTES */}
                     <div className="mt-6 rounded-xl border border-cyan-100 bg-cyan-50 p-5">
                         <h3 className="font-semibold text-gray-800">
                             Booking Management Notes
@@ -744,11 +756,17 @@ function ManageBooking() {
 
                         <ul className="mt-3 list-inside list-disc space-y-2 text-sm text-gray-600">
                             <li>
-                                Rooms 701–706 cost Rs. 6,000 per day.
+                                Standard AC Rooms 701–705 cost Rs. 6,000 per day.
                             </li>
 
                             <li>
-                                Special sea-view Room 707 costs Rs. 7,500 per day.
+                                Special Sea View AC Rooms 706 and 707 cost
+                                Rs. 7,500 per day.
+                            </li>
+
+                            <li>
+                                Both special rooms include a private balcony,
+                                sea view, tea and milk tea facilities.
                             </li>
 
                             <li>

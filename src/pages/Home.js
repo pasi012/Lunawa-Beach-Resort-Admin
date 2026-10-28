@@ -12,7 +12,12 @@ const ROOM_DETAILS = {
     "703": { roomType: "Standard AC Room", price: 6000 },
     "704": { roomType: "Standard AC Room", price: 6000 },
     "705": { roomType: "Standard AC Room", price: 6000 },
-    "706": { roomType: "Standard AC Room", price: 6000 },
+    "706": {
+        roomType: "Special Sea View AC Room",
+        price: 7500,
+        description:
+            "Private balcony, sea view, tea and milk tea facilities.",
+    },
     "707": { roomType: "Special Sea View AC Room", price: 7500 },
 };
 
@@ -122,7 +127,7 @@ function Home() {
         const roomNumber = String(booking.roomNumber || "");
         const inventoryRoom = ROOM_DETAILS[roomNumber];
 
-        return Number(booking.roomPrice) || inventoryRoom?.price || 0;
+        return inventoryRoom?.price ?? (Number(booking.roomPrice) || 0);
     };
 
     // Calculate estimated revenue for a booking.
@@ -197,15 +202,15 @@ function Home() {
         };
     });
 
-    const standardRoomBookings = bookings.filter((booking) =>
-        ["701", "702", "703", "704", "705", "706"].includes(
-            String(booking.roomNumber || "")
-        )
-    ).length;
+    const standardRoomBookings = bookings.filter((booking) => {
+        const roomNumber = Number(booking.roomNumber);
+        return roomNumber >= 701 && roomNumber <= 705;
+    });
 
-    const specialRoomBookings = bookings.filter(
-        (booking) => String(booking.roomNumber || "") === "707"
-    ).length;
+    const specialRoomBookings = bookings.filter((booking) => {
+        const roomNumber = Number(booking.roomNumber);
+        return roomNumber === 706 || roomNumber === 707;
+    });
 
     // ---------------- CURRENT ROOM STATUS ----------------
 
@@ -282,7 +287,7 @@ function Home() {
 
                 <div className="absolute inset-0 bg-black/60" />
 
-                
+
             </section>
 
             {/* ================= DASHBOARD CONTENT ================= */}
@@ -494,11 +499,10 @@ function Home() {
                                     return (
                                         <div
                                             key={roomNumber}
-                                            className={`rounded-xl border p-5 ${
-                                                occupied
-                                                    ? "border-red-200 bg-red-50"
-                                                    : "border-green-200 bg-green-50"
-                                            }`}
+                                            className={`rounded-xl border p-5 ${occupied
+                                                ? "border-red-200 bg-red-50"
+                                                : "border-green-200 bg-green-50"
+                                                }`}
                                         >
                                             <div className="flex items-start justify-between gap-3">
                                                 <div>
@@ -512,11 +516,10 @@ function Home() {
                                                 </div>
 
                                                 <span
-                                                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                                                        occupied
-                                                            ? "bg-red-100 text-red-700"
-                                                            : "bg-green-100 text-green-700"
-                                                    }`}
+                                                    className={`rounded-full px-3 py-1 text-xs font-semibold ${occupied
+                                                        ? "bg-red-100 text-red-700"
+                                                        : "bg-green-100 text-green-700"
+                                                        }`}
                                                 >
                                                     {occupied ? "Occupied" : "Available"}
                                                 </span>
@@ -539,9 +542,9 @@ function Home() {
                                                 </span>
                                             </div>
 
-                                            {roomNumber === "707" && (
+                                            {["706", "707"].includes(roomNumber) && (
                                                 <p className="mt-3 text-xs font-medium text-cyan-800">
-                                                    Balcony · Sea view · Tea facilities
+                                                    Private balcony · Sea view · Tea and milk tea facilities
                                                 </p>
                                             )}
                                         </div>
@@ -566,20 +569,20 @@ function Home() {
 
                                 {[
                                     {
-                                        label: "Standard AC Rooms (701–706)",
-                                        count: standardRoomBookings,
+                                        label: "Standard AC Rooms (701–705)",
+                                        count: standardRoomBookings.length,
                                         color: "bg-[#c97b3a]",
                                     },
                                     {
-                                        label: "Special Sea View Room (707)",
-                                        count: specialRoomBookings,
+                                        label: "Special Sea View Rooms (706-707)",
+                                        count: specialRoomBookings.length,
                                         color: "bg-[#00A6C7]",
                                     },
                                 ].map((item) => {
                                     const percentage = totalBookings
                                         ? Math.round(
-                                              (item.count / totalBookings) * 100
-                                          )
+                                            (item.count / totalBookings) * 100
+                                        )
                                         : 0;
 
                                     return (
@@ -645,8 +648,8 @@ function Home() {
                                 ].map((item) => {
                                     const percentage = totalBookings
                                         ? Math.round(
-                                              (item.count / totalBookings) * 100
-                                          )
+                                            (item.count / totalBookings) * 100
+                                        )
                                         : 0;
 
                                     return (
